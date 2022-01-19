@@ -2,13 +2,16 @@ package test
 
 import (
 	"fmt"
-	"github.com/supabase-community/storage-go"
 	"os"
 	"testing"
+
+	storage_go "github.com/supabase-community/storage-go"
 )
 
-var rawUrl = "https://abc.supabase.co/storage/v1"
-var token = ""
+var (
+	rawUrl = "https://abc.supabase.co/storage/v1"
+	token  = ""
+)
 
 func TestUpload(t *testing.T) {
 	file, err := os.Open("dummy.txt")
@@ -16,11 +19,11 @@ func TestUpload(t *testing.T) {
 		panic(err)
 	}
 	c := storage_go.NewClient(rawUrl, token, map[string]string{})
-	resp := c.UploadFile("test1", "test.txt", file)
+	resp := c.UploadFile("test1", "test.txt", file, "text/plain;charset=UTF-8")
 	fmt.Println(resp)
 
-	//resp = c.UploadFile("test1", "hola.txt", []byte("hello world"))
-	//fmt.Println(resp)
+	// resp = c.UploadFile("test1", "hola.txt", []byte("hello world"))
+	// fmt.Println(resp)
 }
 
 func TestUpdate(t *testing.T) {
@@ -29,7 +32,7 @@ func TestUpdate(t *testing.T) {
 		panic(err)
 	}
 	c := storage_go.NewClient(rawUrl, token, map[string]string{})
-	resp := c.UpdateFile("test1", "test.txt", file)
+	resp := c.UpdateFile("test1", "test.txt", file, "text/plain;charset=UTF-8")
 
 	fmt.Println(resp)
 }
