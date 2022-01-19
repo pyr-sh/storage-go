@@ -1,5 +1,3 @@
-module github.com/pyr-sh/storage-go
+module github.com/supabase-community/storage-go
 
 go 1.17
-
-require github.com/supabase-community/storage-go v0.5.7
