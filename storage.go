@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -21,7 +22,7 @@ const (
 	defaultSortOrder        = "asc"
 )
 
-func (c *Client) UploadOrUpdateFile(bucketId string, relativePath string, data io.Reader, update bool, contentType string) FileUploadResponse {
+func (c *Client) UploadOrUpdateFile(bucketId string, relativePath string, data io.Reader, update bool, contentType string) (*string, error) {
 	c.clientTransport.header.Set("cache-control", defaultFileCacheControl)
 	c.clientTransport.header.Set("content-type", contentType)
 	c.clientTransport.header.Set("x-upsert", strconv.FormatBool(defaultFileUpsert))
@@ -45,21 +46,36 @@ func (c *Client) UploadOrUpdateFile(bucketId string, relativePath string, data i
 			body)
 	}
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 
 	body_, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
 	var response FileUploadResponse
 	err = json.Unmarshal(body_, &response)
+	if err != nil {
+		return nil, err
+	}
 
-	return response
+	if response.Message != "" {
+		return nil, errors.New(response.Message)
+	}
+
+	if response.Key == "" {
+		return nil, errors.New("Invalid file path response")
+	}
+
+	return &response.Key, nil
 }
 
-func (c *Client) UpdateFile(bucketId string, relativePath string, data io.Reader, contentType string) FileUploadResponse {
+func (c *Client) UpdateFile(bucketId string, relativePath string, data io.Reader, contentType string) (*string, error) {
 	return c.UploadOrUpdateFile(bucketId, relativePath, data, true, contentType)
 }
 
-func (c *Client) UploadFile(bucketId string, relativePath string, data io.Reader, contentType string) FileUploadResponse {
+func (c *Client) UploadFile(bucketId string, relativePath string, data io.Reader, contentType string) (*string, error) {
 	return c.UploadOrUpdateFile(bucketId, relativePath, data, false, contentType)
 }
 

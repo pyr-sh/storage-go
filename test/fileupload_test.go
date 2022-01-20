@@ -19,8 +19,8 @@ func TestUpload(t *testing.T) {
 		panic(err)
 	}
 	c := storage_go.NewClient(rawUrl, token, map[string]string{})
-	resp := c.UploadFile("test1", "test.txt", file, "text/plain;charset=UTF-8")
-	fmt.Println(resp)
+	path, err := c.UploadFile("test1", "test.txt", file, "text/plain;charset=UTF-8")
+	fmt.Println(path)
 
 	// resp = c.UploadFile("test1", "hola.txt", []byte("hello world"))
 	// fmt.Println(resp)
@@ -32,9 +32,9 @@ func TestUpdate(t *testing.T) {
 		panic(err)
 	}
 	c := storage_go.NewClient(rawUrl, token, map[string]string{})
-	resp := c.UpdateFile("test1", "test.txt", file, "text/plain;charset=UTF-8")
+	path, err := c.UpdateFile("test1", "test.txt", file, "text/plain;charset=UTF-8")
 
-	fmt.Println(resp)
+	fmt.Println(path)
 }
 
 func TestMoveFile(t *testing.T) {
